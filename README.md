@@ -1,6 +1,6 @@
 # Task Manager API
 
-API REST para gerenciamento de tarefas desenvolvida em Java com Spring Boot.
+API REST para gerenciamento de tarefas desenvolvida em Java com Spring Boot
 
 ## 🛠️ Tecnologias Utilizadas
 
