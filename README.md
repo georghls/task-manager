@@ -43,8 +43,6 @@ O projeto utiliza o banco de dados em memória **H2** para facilidade de desenvo
 
 - **URL do Console:** `http://localhost:8080/h2-console`
 - **JDBC URL:** `jdbc:h2:mem:testdb`
-- **Usuário:** `sa`
-- **Senha:** *(em branco)*
 
 ## 📌 Endpoints da API
 
