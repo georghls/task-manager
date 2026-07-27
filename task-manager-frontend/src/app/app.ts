@@ -1,12 +1,12 @@
 import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { TaskDashboard } from './features/tasks/components/task-dashboard/task-dashboard';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [TaskDashboard],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App {
-  protected readonly title = signal('task-manager-frontend');
+  protected readonly title = signal('Task Manager');
 }

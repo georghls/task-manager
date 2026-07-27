@@ -1,1 +1,164 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+:root {
+    /* Cores - Dark Slate & Acentos Vibrantes */
+    --bg-primary: #0b0f19;
+    --bg-secondary: #111827;
+    --bg-surface: rgba(30, 41, 59, 0.65);
+    --bg-surface-hover: rgba(51, 65, 85, 0.75);
+
+    --border-color: #1e293b;
+    --border-glow: rgba(225, 29, 72, 0.3);
+
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+
+    --accent-pink: #e11d48;
+    --accent-pink-glow: rgba(225, 29, 72, 0.25);
+    --accent-pink-gradient: linear-gradient(135deg, #f43f5e 0%, #be123c 100%);
+
+    --accent-cyan: #38bdf8;
+    --accent-cyan-soft: rgba(56, 189, 248, 0.15);
+
+    --accent-emerald: #10b981;
+    --accent-emerald-soft: rgba(16, 185, 129, 0.15);
+
+    --accent-amber: #f59e0b;
+    --accent-amber-soft: rgba(245, 158, 11, 0.15);
+
+    /* Fontes */
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    /* Bordas e Sombras */
+    --backdrop-blur: blur(16px);
+    --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    height: 100%;
+    scroll-behavior: smooth;
+}
+
+body {
+    background:
+        radial-gradient(circle at 10% 10%, #1e1b4b 0%, transparent 45%),
+        radial-gradient(circle at 90% 20%, #4c0519 0%, transparent 40%),
+        radial-gradient(circle at 50% 80%, #0f172a 0%, transparent 50%),
+        var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Card com Efeito de Vidro (Glassmorphism) */
+.glass-card {
+    background: var(--bg-surface);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.glass-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(225, 29, 72, 0.4);
+    box-shadow: 0 12px 35px -10px rgba(225, 29, 72, 0.15);
+}
+
+/* Botões */
+.btn {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: var(--accent-pink-gradient);
+    color: #ffffff;
+    box-shadow: 0 4px 15px var(--accent-pink-glow);
+}
+
+.btn-primary:hover {
+    opacity: 0.95;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(225, 29, 72, 0.4);
+}
+
+.btn-secondary {
+    background: rgba(51, 65, 85, 0.5);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background: rgba(51, 65, 85, 0.8);
+    border-color: var(--text-muted);
+}
+
+/* Badges / Etiquetas de Status */
+.badge {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.badge-pending {
+    background: var(--accent-amber-soft);
+    color: #fde68a;
+    border: 1px solid var(--accent-amber);
+}
+
+.badge-completed {
+    background: var(--accent-emerald-soft);
+    color: #a7f3d0;
+    border: 1px solid var(--accent-emerald);
+}
+
+/* Scrollbar Customizada */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
