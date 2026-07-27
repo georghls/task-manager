@@ -1,1 +1,61 @@
-<p>task-list works!</p>
+<div class="list-controls glass-card">
+    <!-- Campo de Busca por Texto -->
+    <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Pesquisar por título ou descrição..." [value]="searchTerm()"
+            (input)="onSearchChange($event)" class="search-input" />
+    </div>
+
+    <!-- Botões de Filtro por Status -->
+    <div class="filter-pills">
+        <button class="pill-btn" [class.active]="filterStatus() === 'ALL'" (click)="setFilter('ALL')">
+            Todas
+        </button>
+        <button class="pill-btn" [class.active]="filterStatus() === 'PENDING'" (click)="setFilter('PENDING')">
+            Pendentes
+        </button>
+        <button class="pill-btn" [class.active]="filterStatus() === 'COMPLETED'" (click)="setFilter('COMPLETED')">
+            Concluídas
+        </button>
+    </div>
+</div>
+
+<!-- Lista de Tarefas (Usando o bloco reativo @for do Angular 18+) -->
+<div class="task-grid">
+    @for (task of filteredTasks(); track task.id) {
+    <div class="glass-card task-card" [class.completed]="task.concluida">
+        <div class="task-content">
+            <div class="task-header">
+                <h3 class="task-title">{{ task.titulo }}</h3>
+                <span class="badge" [class.badge-completed]="task.concluida" [class.badge-pending]="!task.concluida">
+                    {{ task.concluida ? 'Concluída' : 'Pendente' }}
+                </span>
+            </div>
+
+            @if (task.descricao) {
+            <p class="task-desc">{{ task.descricao }}</p>
+            }
+        </div>
+
+        <div class="task-actions">
+            <!-- Botão Concluir / Desmarcar -->
+            <button class="btn-action" [class.btn-toggle-done]="!task.concluida"
+                [class.btn-toggle-undo]="task.concluida" (click)="onToggle(task.id)"
+                [title]="task.concluida ? 'Marcar como pendente' : 'Concluir tarefa'">
+                {{ task.concluida ? '↩️ Desfazer' : '✅ Concluir' }}
+            </button>
+
+            <!-- Botão Excluir -->
+            <button class="btn-action btn-delete" (click)="onDelete(task.id)" title="Excluir tarefa">
+                🗑️ Excluir
+            </button>
+        </div>
+    </div>
+    } @empty {
+    <div class="glass-card empty-state">
+        <div class="empty-icon">📭</div>
+        <h3>Nenhuma tarefa encontrada</h3>
+        <p>Tente ajustar seus termos de busca ou filtros.</p>
+    </div>
+    }
+</div>

@@ -11,8 +11,8 @@
             <span class="stat-title">Total de Tarefas</span>
             <span class="stat-icon pink">📊</span>
         </div>
-        <div class="stat-value">0</div>
-        <div class="stat-footer">Aguardando integração na Fase 2</div>
+        <div class="stat-value">{{ totalTasks() }}</div>
+        <div class="stat-footer">Tarefas cadastradas no sistema</div>
     </div>
 
     <div class="glass-card stat-card">
@@ -20,8 +20,8 @@
             <span class="stat-title">Pendentes</span>
             <span class="stat-icon amber">⏳</span>
         </div>
-        <div class="stat-value">0</div>
-        <div class="stat-footer">Aguardando integração na Fase 2</div>
+        <div class="stat-value">{{ pendingTasks() }}</div>
+        <div class="stat-footer">Aguardando conclusão</div>
     </div>
 
     <div class="glass-card stat-card">
@@ -29,13 +29,11 @@
             <span class="stat-title">Concluídas</span>
             <span class="stat-icon emerald">✅</span>
         </div>
-        <div class="stat-value">0</div>
-        <div class="stat-footer">Aguardando integração na Fase 2</div>
+        <div class="stat-value">{{ completedTasks() }}</div>
+        <div class="stat-footer">Finalizadas com sucesso</div>
     </div>
 </div>
 
-<div class="glass-card phase-info">
-    <h3>✨ Fase 1 Concluída com Sucesso</h3>
-    <p>A estrutura base do Angular Standalone, o Design System com tema Dark Mode, os modelos TypeScript e o serviço de
-        comunicação HTTP estão prontos!</p>
-</div>
+<!-- Renderiza a lista de tarefas e conecta os eventos de ação -->
+<app-task-list [tasks]="tasks()" (toggleComplete)="handleToggleComplete($event)"
+    (deleteTask)="handleDeleteTask($event)"></app-task-list>
