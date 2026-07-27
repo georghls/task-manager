@@ -40,8 +40,8 @@
 </div>
 
 <!-- Lista de Tarefas -->
-<app-task-list [tasks]="tasks()" (toggleComplete)="handleToggleComplete($event)"
-    (deleteTask)="handleDeleteTask($event)"></app-task-list>
+<app-task-list [tasks]="tasks()" (toggleComplete)="handleToggleComplete($event)" (deleteTask)="handleDeleteTask($event)"
+    (editTask)="openEditModal($event)"></app-task-list>
 
 <!-- Modal Reativo de Formulário (exibido apenas se isModalOpen() for true) -->
 @if (isModalOpen()) {

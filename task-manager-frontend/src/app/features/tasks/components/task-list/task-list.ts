@@ -17,6 +17,7 @@ export class TaskList {
   // Eventos emitidos para o pai quando o usuário clica para alternar status ou excluir
   toggleComplete = output<number>();
   deleteTask = output<number>();
+  editTask = output<TaskResponseDTO>();
 
   // Signals locais para busca e filtro por status
   searchTerm = signal<string>('');
@@ -52,6 +53,9 @@ export class TaskList {
     this.filterStatus.set(status);
   }
 
+  onEdit(task: TaskResponseDTO): void {
+    this.editTask.emit(task);
+  }
   onToggle(id: number): void {
     this.toggleComplete.emit(id);
   }

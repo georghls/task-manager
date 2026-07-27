@@ -56,6 +56,11 @@ export class TaskDashboard implements OnInit {
     this.taskToEdit.set(null);
     this.isModalOpen.set(true);
   }
+
+  openEditModal(task: TaskResponseDTO): void {
+    this.taskToEdit.set(task);
+    this.isModalOpen.set(true);
+  }
   closeModal(): void {
     this.isModalOpen.set(false);
     this.taskToEdit.set(null);

@@ -38,6 +38,12 @@
         </div>
 
         <div class="task-actions">
+
+            <!-- Botão Editar -->
+            <button class="btn-action btn-edit" (click)="onEdit(task)" title="Editar tarefa">
+                ✏️ Editar
+            </button>
+
             <!-- Botão Concluir / Desmarcar -->
             <button class="btn-action" [class.btn-toggle-done]="!task.concluida"
                 [class.btn-toggle-undo]="task.concluida" (click)="onToggle(task.id)"

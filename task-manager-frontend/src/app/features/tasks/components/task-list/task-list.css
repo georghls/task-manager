@@ -156,6 +156,16 @@
     background: rgba(225, 29, 72, 0.3);
 }
 
+.btn-edit {
+    background: rgba(56, 189, 248, 0.15);
+    color: #bae6fd;
+    border: 1px solid var(--accent-cyan);
+}
+
+.btn-edit:hover {
+    background: rgba(56, 189, 248, 0.3);
+}
+
 .empty-state {
     padding: 40px;
     text-align: center;
