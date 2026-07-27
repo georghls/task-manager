@@ -3,6 +3,11 @@
         <h1>Painel de <span class="highlight">Tarefas</span></h1>
         <p class="subtitle">Gerencie suas atividades com eficiência e acompanhe o progresso em tempo real.</p>
     </div>
+
+    <!-- Botão para abrir o Modal de Nova Tarefa -->
+    <button class="btn btn-primary" (click)="openCreateModal()">
+        ✨ + Nova Tarefa
+    </button>
 </div>
 
 <div class="stats-grid">
@@ -34,6 +39,12 @@
     </div>
 </div>
 
-<!-- Renderiza a lista de tarefas e conecta os eventos de ação -->
+<!-- Lista de Tarefas -->
 <app-task-list [tasks]="tasks()" (toggleComplete)="handleToggleComplete($event)"
     (deleteTask)="handleDeleteTask($event)"></app-task-list>
+
+<!-- Modal Reativo de Formulário (exibido apenas se isModalOpen() for true) -->
+@if (isModalOpen()) {
+<app-task-form-modal [taskToEdit]="taskToEdit()" (saveTask)="handleSaveTask($event)"
+    (closeModal)="closeModal()"></app-task-form-modal>
+}

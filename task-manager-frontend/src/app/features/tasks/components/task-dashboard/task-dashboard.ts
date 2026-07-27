@@ -1,12 +1,13 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { TaskService } from '../../../../core/services/task';
-import { TaskResponseDTO } from '../../../../core/models/task';
+import { TaskRequestDTO, TaskResponseDTO } from '../../../../core/models/task';
 import { TaskList } from '../task-list/task-list';
+import { TaskFormModal } from '../task-form-modal/task-form-modal';
 
 @Component({
   selector: 'app-task-dashboard',
   standalone: true,
-  imports: [TaskList],
+  imports: [TaskList, TaskFormModal],
   templateUrl: './task-dashboard.html',
   styleUrl: './task-dashboard.css',
 })
@@ -19,6 +20,10 @@ export class TaskDashboard implements OnInit {
 
   // Signal de estado de carregamento
   loading = signal<boolean>(true);
+
+  // Signals para controlar o estado do Modal
+  isModalOpen = signal<boolean>(false);
+  taskToEdit = signal<TaskResponseDTO | null>(null);
 
   // Signals computados automaticamente com base na lista 'tasks'
   totalTasks = computed(() => this.tasks().length);
@@ -44,6 +49,42 @@ export class TaskDashboard implements OnInit {
         this.loading.set(false);
       }
     });
+  }
+
+  // Métodos de Abertura e Fechamento do Modal
+  openCreateModal(): void {
+    this.taskToEdit.set(null);
+    this.isModalOpen.set(true);
+  }
+  closeModal(): void {
+    this.isModalOpen.set(false);
+    this.taskToEdit.set(null);
+  }
+
+  /**
+   * Salva a tarefa (Criação ou Edição) na API Spring Boot
+   */
+  handleSaveTask(dto: TaskRequestDTO): void {
+    const currentTask = this.taskToEdit();
+    if (currentTask) {
+      // Edição (PUT /tasks/{id})
+      this.taskService.updateTask(currentTask.id, dto).subscribe({
+        next: () => {
+          this.closeModal();
+          this.loadTasks();
+        },
+        error: (err) => console.error('Erro ao atualizar tarefa:', err)
+      });
+    } else {
+      // Criação (POST /tasks)
+      this.taskService.createTask(dto).subscribe({
+        next: () => {
+          this.closeModal();
+          this.loadTasks();
+        },
+        error: (err) => console.error('Erro ao criar tarefa:', err)
+      });
+    }
   }
 
   /**
