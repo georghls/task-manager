@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planejamento — Task Manager API · Spring Boot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #161c1a;
+    --bg-elevated: #1d2422;
+    --bg-card: #202826;
+    --panel-border: #303c38;
+    --text: #e9ede9;
+    --text-dim: #9fb0a8;
+    --text-faint: #6c7d75;
+    --spring: #6db33f;
+    --spring-soft: #6db33f22;
+    --java: #d9a066;
+    --java-soft: #d9a06622;
+    --red: #d9686b;
+    --blue: #6ba3d9;
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:
+      radial-gradient(circle at 15% 0%, #223129 0%, transparent 45%),
+      radial-gradient(circle at 100% 20%, #2a2419 0%, transparent 40%),
+      var(--bg);
+    color:var(--text);
+    font-family: var(--font-display);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;}
+
+  ::selection{ background:var(--spring-soft); color:var(--text); }
+
+  /* ---------- layout shell ---------- */
+  .wrap{ max-width:920px; margin:0 auto; padding:0 28px; }
+
+  nav.topbar{
+    position:sticky; top:0; z-index:50;
+    backdrop-filter: blur(10px);
+    background:#161c1acc;
+    border-bottom:1px solid var(--panel-border);
+  }
+  nav.topbar .wrap{
+    display:flex; align-items:center; justify-content:space-between;
+    padding-top:14px; padding-bottom:14px;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; font-family:var(--font-mono); font-weight:600; font-size:14px; letter-spacing:.02em;}
+  .brand .dot{ width:9px; height:9px; border-radius:50%; background:var(--spring); box-shadow:0 0 10px #6db33f99; }
+  .navlinks{ display:flex; gap:22px; font-size:13px; font-family:var(--font-mono); color:var(--text-dim); flex-wrap:wrap;}
+  .navlinks a{ text-decoration:none; transition:color .15s ease; }
+  .navlinks a:hover{ color:var(--spring); }
+  @media (max-width:720px){ .navlinks{ display:none; } }
+
+  /* ---------- hero ---------- */
+  header.hero{ padding:76px 0 40px; position:relative; overflow:hidden; }
+  .eyebrow{
+    font-family:var(--font-mono); font-size:12px; color:var(--spring);
+    letter-spacing:.14em; text-transform:uppercase; margin-bottom:18px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{ content:''; width:22px; height:1px; background:var(--spring); display:inline-block; }
+  h1{
+    font-size:clamp(34px, 5.4vw, 54px);
+    font-weight:700; line-height:1.08; letter-spacing:-0.01em;
+    max-width:14ch;
+  }
+  h1 .accent{ color:var(--spring); }
+  .hero-sub{
+    margin-top:22px; max-width:56ch; color:var(--text-dim); font-size:16.5px;
+  }
+  .hero-meta{
+    margin-top:30px; display:flex; gap:28px; flex-wrap:wrap;
+    font-family:var(--font-mono); font-size:12.5px; color:var(--text-faint);
+  }
+  .hero-meta b{ color:var(--text); font-weight:600; }
+
+  /* ---------- signature: layered architecture stack ---------- */
+  .stack{
+    margin-top:46px; border:1px solid var(--panel-border); border-radius:14px;
+    background:var(--bg-elevated); padding:26px 26px 30px;
+  }
+  .stack-title{ font-family:var(--font-mono); font-size:12px; color:var(--text-faint); margin-bottom:18px; letter-spacing:.06em;}
+  .layer{
+    position:relative;
+    border:1px solid var(--panel-border);
+    border-radius:10px;
+    padding:16px 18px;
+    margin-bottom:10px;
+    background:var(--bg-card);
+    opacity:0; transform:translateY(14px);
+    animation:rise .6s ease forwards;
+    transition:border-color .2s ease, transform .2s ease;
+  }
+  .layer:hover{ border-color:var(--spring); transform:translateX(4px); }
+  .layer:nth-child(2){ animation-delay:.05s; }
+  .layer:nth-child(3){ animation-delay:.15s; }
+  .layer:nth-child(4){ animation-delay:.25s; }
+  .layer:nth-child(5){ animation-delay:.35s; }
+  @keyframes rise{ to{ opacity:1; transform:translateY(0); } }
+  .layer-row{ display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+  .layer-name{ font-family:var(--font-mono); font-weight:700; font-size:14.5px; }
+  .layer-name .num{ color:var(--java); margin-right:10px; }
+  .layer-desc{ color:var(--text-dim); font-size:13.5px; margin-top:6px; }
+  .layer-tag{
+    font-family:var(--font-mono); font-size:11px; color:var(--spring);
+    background:var(--spring-soft); border:1px solid #6db33f44; padding:3px 9px; border-radius:20px; white-space:nowrap;
+  }
+  .layer-arrow{ text-align:center; color:var(--text-faint); font-family:var(--font-mono); font-size:13px; margin:2px 0 8px; }
+
+  /* ---------- sections ---------- */
+  section{ padding:64px 0; border-top:1px solid var(--panel-border); }
+  section:first-of-type{ border-top:none; }
+  .section-head{ display:flex; align-items:baseline; gap:14px; margin-bottom:28px; }
+  .section-num{ font-family:var(--font-mono); color:var(--java); font-size:14px; font-weight:600; }
+  h2{ font-size:26px; font-weight:700; letter-spacing:-0.01em; }
+  .lede{ color:var(--text-dim); max-width:68ch; margin-bottom:30px; font-size:15.5px; }
+
+  /* concept cards */
+  .grid{ display:grid; grid-template-columns:repeat(2, 1fr); gap:16px; }
+  @media (max-width:680px){ .grid{ grid-template-columns:1fr; } }
+  .card{
+    border:1px solid var(--panel-border); background:var(--bg-elevated);
+    border-radius:12px; padding:20px 22px;
+  }
+  .card h3{
+    font-family:var(--font-mono); font-size:14.5px; color:var(--spring); margin-bottom:8px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .card p{ color:var(--text-dim); font-size:13.8px; }
+  .card code, p code, li code{
+    font-family:var(--font-mono); font-size:.92em; color:var(--java);
+    background:var(--java-soft); padding:1px 6px; border-radius:5px;
+  }
+
+  /* package tree */
+  pre.tree{
+    font-family:var(--font-mono); font-size:13px; line-height:1.85;
+    background:#10140F; border:1px solid var(--panel-border); border-radius:12px;
+    padding:22px 24px; overflow-x:auto; color:var(--text-dim);
+  }
+  pre.tree .folder{ color:var(--blue); }
+  pre.tree .file{ color:var(--text); }
+  pre.tree .comment{ color:var(--text-faint); }
+
+  /* endpoint table */
+  .tbl-wrap{ overflow-x:auto; border:1px solid var(--panel-border); border-radius:12px; }
+  table{ width:100%; border-collapse:collapse; font-size:13.5px; min-width:640px; }
+  thead th{
+    text-align:left; font-family:var(--font-mono); font-size:11.5px; letter-spacing:.05em;
+    text-transform:uppercase; color:var(--text-faint); padding:14px 16px;
+    background:var(--bg-elevated); border-bottom:1px solid var(--panel-border);
+  }
+  tbody td{ padding:14px 16px; border-bottom:1px solid var(--panel-border); vertical-align:top; }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:hover{ background:#1a211f; }
+  .verb{
+    font-family:var(--font-mono); font-weight:700; font-size:12px;
+    padding:3px 9px; border-radius:6px; display:inline-block;
+  }
+  .v-get{ color:var(--blue); background:#6ba3d922; }
+  .v-post{ color:var(--spring); background:var(--spring-soft); }
+  .v-put{ color:var(--java); background:var(--java-soft); }
+  .v-delete{ color:var(--red); background:#d9686b22; }
+  .status{ font-family:var(--font-mono); font-size:12.5px; }
+  .status.ok{ color:var(--spring); }
+  .status.err{ color:var(--red); }
+  code.endpoint{ font-family:var(--font-mono); font-size:12.8px; color:var(--text); }
+
+  /* roadmap checklist */
+  .roadmap{ counter-reset:step; }
+  .step{
+    display:grid; grid-template-columns:40px 1fr; gap:16px;
+    padding:18px 0; border-bottom:1px solid var(--panel-border);
+  }
+  .step:last-child{ border-bottom:none; }
+  .step-num{
+    counter-increment:step; font-family:var(--font-mono); font-weight:700; color:var(--java);
+    font-size:14px;
+  }
+  .step-num::before{ content: counter(step, decimal-leading-zero); }
+  .step h4{ font-size:15.5px; margin-bottom:5px; }
+  .step p{ color:var(--text-dim); font-size:13.8px; max-width:62ch; }
+
+  /* entity model */
+  .entity{
+    font-family:var(--font-mono); font-size:13.4px; background:#10140F;
+    border:1px solid var(--panel-border); border-radius:12px; overflow:hidden;
+  }
+  .entity .head{ background:var(--spring-soft); color:var(--spring); padding:12px 18px; font-weight:700; border-bottom:1px solid var(--panel-border); }
+  .entity .row{ display:flex; justify-content:space-between; padding:10px 18px; border-bottom:1px solid #232b28; color:var(--text-dim); }
+  .entity .row:last-child{ border-bottom:none; }
+  .entity .row .type{ color:var(--java); }
+  .entity .row .ann{ color:var(--text-faint); font-size:11.8px; }
+
+  /* stack chips */
+  .chips{ display:flex; flex-wrap:wrap; gap:10px; }
+  .chip{
+    font-family:var(--font-mono); font-size:12.5px; padding:8px 14px; border-radius:8px;
+    border:1px solid var(--panel-border); background:var(--bg-elevated); color:var(--text-dim);
+  }
+  .chip b{ color:var(--text); }
+
+  footer{ padding:50px 0 70px; border-top:1px solid var(--panel-border); }
+  footer p{ color:var(--text-faint); font-size:13px; font-family:var(--font-mono); }
+
+  .fade-in{ opacity:0; transform:translateY(16px); transition:opacity .6s ease, transform .6s ease; }
+  .fade-in.visible{ opacity:1; transform:translateY(0); }
+
+  @media (prefers-reduced-motion: reduce){
+    .layer, .fade-in{ animation:none !important; transition:none !important; opacity:1 !important; transform:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topbar">
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span> task-manager-api</div>
+    <div class="navlinks">
+      <a href="#arquitetura">Arquitetura</a>
+      <a href="#pacotes">Pacotes</a>
+      <a href="#modelo">Modelo</a>
+      <a href="#endpoints">Endpoints</a>
+      <a href="#conceitos">Conceitos</a>
+      <a href="#stack">Stack</a>
+      <a href="#roadmap">Roadmap</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Documento de planejamento</div>
+    <h1>Task Manager <span class="accent">API</span><br>com Spring Boot</h1>
+    <p class="hero-sub">
+      O "Hello World" do backend: um CRUD de tarefas para você sentir na prática como os dados
+      fluem entre Controller, Service e Repository — sem lógica de negócio complexa no caminho.
+    </p>
+    <div class="hero-meta">
+      <div><b>Nível</b> · iniciante em Spring Boot</div>
+      <div><b>Java</b> · 17+</div>
+      <div><b>Foco</b> · REST, camadas, status HTTP</div>
+    </div>
+
+    <div class="stack">
+      <div class="stack-title">// fluxo de uma requisição, camada por camada</div>
+
+      <div class="layer">
+        <div class="layer-row">
+          <div class="layer-name"><span class="num">01</span>Controller</div>
+          <div class="layer-tag">@RestController</div>
+        </div>
+        <div class="layer-desc">Recebe a requisição HTTP, valida o formato de entrada e devolve o status/corpo da resposta.</div>
+      </div>
+      <div class="layer-arrow">↓ chama</div>
+
+      <div class="layer">
+        <div class="layer-row">
+          <div class="layer-name"><span class="num">02</span>Service</div>
+          <div class="layer-tag">@Service</div>
+        </div>
+        <div class="layer-desc">Concentra a regra de negócio: "marcar como concluída", validações, orquestração.</div>
+      </div>
+      <div class="layer-arrow">↓ chama</div>
+
+      <div class="layer">
+        <div class="layer-row">
+          <div class="layer-name"><span class="num">03</span>Repository</div>
+          <div class="layer-tag">@Repository</div>
+        </div>
+        <div class="layer-desc">Interface que conversa com o banco de dados via Spring Data JPA, sem SQL manual.</div>
+      </div>
+      <div class="layer-arrow">↓ persiste em</div>
+
+      <div class="layer">
+        <div class="layer-row">
+          <div class="layer-name"><span class="num">04</span>Banco de dados</div>
+          <div class="layer-tag">H2 / PostgreSQL</div>
+        </div>
+        <div class="layer-desc">Onde a tabela <code>task</code> vive de fato, mapeada a partir da entidade <code>@Entity</code>.</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="arquitetura">
+  <div class="wrap">
+    <div class="section-head"><span class="section-num">§1</span><h2>Por que essa arquitetura em camadas</h2></div>
+    <p class="lede">
+      Separar responsabilidades é o principal aprendizado deste projeto. Cada camada só conhece a camada
+      imediatamente abaixo dela — o Controller nunca fala diretamente com o banco, por exemplo.
+    </p>
+    <div class="grid">
+      <div class="card">
+        <h3>Controller</h3>
+        <p>Traduz o mundo HTTP (verbos, headers, JSON) em chamadas Java simples. Não deve conter regra de negócio.</p>
+      </div>
+      <div class="card">
+        <h3>Service</h3>
+        <p>Onde mora a lógica: por exemplo, impedir que uma tarefa já concluída seja concluída de novo.</p>
+      </div>
+      <div class="card">
+        <h3>Repository</h3>
+        <p>Estende <code>JpaRepository</code> e ganha métodos como <code>save()</code>, <code>findAll()</code> e <code>deleteById()</code> de graça.</p>
+      </div>
+      <div class="card">
+        <h3>DTO (opcional, recomendado)</h3>
+        <p>Objetos de entrada/saída separados da entidade JPA, evitando expor detalhes internos do banco na API.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pacotes">
+  <div class="wrap">
+    <div class="section-head"><span class="section-num">§2</span><h2>Estrutura de pacotes sugerida</h2></div>
+    <p class="lede">Organização por camada (a mais comum para projetos pequenos como este):</p>
+    <pre class="tree"><span class="folder">com.seuprojeto.taskmanager</span>
+├── <span class="folder">controller</span>
+│   └── <span class="file">TaskController.java</span>        <span class="comment">// endpoints REST</span>
+├── <span class="folder">service</span>
+│   └── <span class="file">TaskService.java</span>           <span class="comment">// regras de negócio</span>
+├── <span class="folder">repository</span>
+│   └── <span class="file">TaskRepository.java</span>        <span class="comment">// interface JpaRepository</span>
+├── <span class="folder">model</span>  <span class="comment">(ou "entity")</span>
+│   └── <span class="file">Task.java</span>                  <span class="comment">// @Entity mapeada para a tabela</span>
+├── <span class="folder">dto</span>
+│   ├── <span class="file">TaskRequestDTO.java</span>
+│   └── <span class="file">TaskResponseDTO.java</span>
+├── <span class="folder">exception</span>
+│   ├── <span class="file">TaskNotFoundException.java</span>
+│   └── <span class="file">GlobalExceptionHandler.java</span> <span class="comment">// @ControllerAdvice</span>
+└── <span class="file">TaskManagerApplication.java</span>     <span class="comment">// @SpringBootApplication</span></pre>
+  </div>
+</section>
+
+<section id="modelo">
+  <div class="wrap">
+    <div class="section-head"><span class="section-num">§3</span><h2>Modelagem da entidade Task</h2></div>
+    <p class="lede">Comece simples — dá para evoluir depois com prioridade, categorias ou prazos.</p>
+    <div class="entity">
+      <div class="head">Task <span style="color:var(--text-faint); font-weight:400;">@Entity</span></div>
+      <div class="row"><span>id</span><span class="type">Long <span class="ann">@Id @GeneratedValue</span></span></div>
+      <div class="row"><span>titulo</span><span class="type">String <span class="ann">@NotBlank</span></span></div>
+      <div class="row"><span>descricao</span><span class="type">String</span></div>
+      <div class="row"><span>concluida</span><span class="type">boolean <span class="ann">default false</span></span></div>
+      <div class="row"><span>dataCriacao</span><span class="type">LocalDateTime</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="endpoints">
+  <div class="wrap">
+    <div class="section-head"><span class="section-num">§4</span><h2>Endpoints REST e status HTTP</h2></div>
+    <p class="lede">
+      Esse é o coração do exercício: cada verbo tem uma intenção, e cada resposta precisa carregar
+      o status certo — é isso que torna a API previsível para quem a consome.
+    </p>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>Verbo</th><th>Endpoint</th><th>Ação</th><th>Sucesso</th><th>Erro comum</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="verb v-post">POST</span></td>
+            <td><code class="endpoint">/tasks</code></td>
+            <td>Cria uma nova tarefa</td>
+            <td><span class="status ok">201 Created</span></td>
+            <td><span class="status err">400 Bad Request</span></td>
+          </tr>
+          <tr>
+            <td><span class="verb v-get">GET</span></td>
+            <td><code class="endpoint">/tasks</code></td>
+            <td>Lista todas as tarefas</td>
+            <td><span class="status ok">200 OK</span></td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td><span class="verb v-get">GET</span></td>
+            <td><code class="endpoint">/tasks/{id}</code></td>
+            <td>Busca uma tarefa específica</td>
+            <td><span class="status ok">200 OK</span></td>
+            <td><span class="status err">404 Not Found</span></td>
+          </tr>
+          <tr>
+            <td><span class="verb v-put">PUT</span></td>
+            <td><code class="endpoint">/tasks/{id}</code></td>
+            <td>Atualiza dados da tarefa</td>
+            <td><span class="status ok">200 OK</span></td>
+            <td><span class="status err">404 Not Found</span></td>
+          </tr>
+          <tr>
+            <td><span class="verb v-put">PATCH</span></td>
+            <td><code class="endpoint">/tasks/{id}/concluir</code></td>
+            <td>Marca como concluída</td>
+            <td><span class="status ok">200 OK</span></td>
+            <td><span class="status err">404 Not Found</span></td>
+          </tr>
+          <tr>
+            <td><span class="verb v-delete">DELETE</span></td>
+            <td><code class="endpoint">/tasks/{id}</code></td>
+            <td>Remove a tarefa</td>
+            <td><span class="status ok">204 No Content</span></td>
+            <td><span class="status err">404 Not Found</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="conceitos">
+  <div class="wrap">
+    <div class="section-head"><span class="section-num">§5</span><h2>Conceitos-chave que o projeto ensina</h2></div>
+    <div class="grid">
+      <div class="card">
+        <h3>Injeção de dependência</h3>
+        <p>Use injeção via construtor (não <code>@Autowired</code> em campo) para instanciar <code>Service</code> dentro do <code>Controller</code>. É a base de como o Spring gerencia objetos.</p>
+      </div>
+      <div class="card">
+        <h3>ResponseEntity&lt;T&gt;</h3>
+        <p>Permite controlar explicitamente o status HTTP e o corpo da resposta, em vez de deixar o Spring decidir por você.</p>
+      </div>
+      <div class="card">
+        <h3>Spring Data JPA</h3>
+        <p><code>TaskRepository extends JpaRepository&lt;Task, Long&gt;</code> já entrega CRUD completo sem uma linha de SQL.</p>
+      </div>
+      <div class="card">
+        <h3>Bean Validation</h3>
+        <p><code>@Valid</code> + <code>@NotBlank</code> no DTO garantem que dados inválidos nunca cheguem ao Service.</p>
+      </div>
+      <div class="card">
+        <h3>Tratamento de exceções</h3>
+        <p>Uma <code>TaskNotFoundException</code> capturada por um <code>@ControllerAdvice</code> centraliza o 404 em um único lugar.</p>
+      </div>
+      <div class="card">
+        <h3>DTO vs Entity</h3>
+        <p>Nunca devolva a entidade JPA diretamente na resposta — isso vaza detalhes de persistência e dificulta versionar a API.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="stack">
+  <div class="wrap">
+    <div class="section-head"><span class="section-num">§6</span><h2>Stack sugerida</h2></div>
+    <div class="chips">
+      <span class="chip"><b>Java 17+</b> · linguagem</span>
+      <span class="chip"><b>Spring Boot 3</b> · framework</span>
+      <span class="chip"><b>Spring Web</b> · REST</span>
+      <span class="chip"><b>Spring Data JPA</b> · persistência</span>
+      <span class="chip"><b>H2</b> · banco em memória p/ dev</span>
+      <span class="chip"><b>Maven</b> · build</span>
+      <span class="chip"><b>Lombok</b> · reduz boilerplate</span>
+      <span class="chip"><b>Postman / Insomnia</b> · testar endpoints</span>
+    </div>
+  </div>
+</section>
+
+<section id="roadmap">
+  <div class="wrap">
+    <div class="section-head"><span class="section-num">§7</span><h2>Roteiro de implementação</h2></div>
+    <div class="roadmap">
+      <div class="step">
+        <div class="step-num"></div>
+        <div><h4>Gerar o projeto no Spring Initializr</h4><p>Dependências: Spring Web, Spring Data JPA, H2 Database, Lombok, Validation.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div><h4>Criar a entidade <code>Task</code></h4><p>Anotar com <code>@Entity</code>, definir os campos e usar Lombok (<code>@Getter/@Setter</code>) para evitar boilerplate.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div><h4>Criar o <code>TaskRepository</code></h4><p>Interface simples estendendo <code>JpaRepository&lt;Task, Long&gt;</code>.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div><h4>Implementar o <code>TaskService</code></h4><p>Métodos: <code>criar</code>, <code>listarTodas</code>, <code>buscarPorId</code>, <code>atualizar</code>, <code>concluir</code>, <code>deletar</code>.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div><h4>Implementar o <code>TaskController</code></h4><p>Mapear os 6 endpoints da tabela acima, sempre devolvendo <code>ResponseEntity</code>.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div><h4>Tratar erros globalmente</h4><p>Criar <code>TaskNotFoundException</code> + <code>@ControllerAdvice</code> para padronizar respostas 404/400.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div><h4>Testar com Postman/Insomnia</h4><p>Validar cada verbo manualmente e conferir se os status batem com o planejado.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div><h4>(Extra) Testes automatizados</h4><p><code>@WebMvcTest</code> para o Controller e <code>@DataJpaTest</code> para o Repository.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>Documento de planejamento gerado para apoiar o estudo prático de Java + Spring Boot.</p>
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('section').forEach(s => {
+    s.classList.add('fade-in');
+    observer.observe(s);
+  });
+</script>
+
+</body>
+</html>

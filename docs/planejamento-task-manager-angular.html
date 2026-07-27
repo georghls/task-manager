@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planejamento — Task Manager Frontend · Angular</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f172a;
+    --bg-elevated: #1e293b;
+    --bg-card: #1e293b88;
+    --panel-border: #334155;
+    --panel-border-glow: #e11d4844;
+    --text: #f8fafc;
+    --text-dim: #94a3b8;
+    --text-faint: #64748b;
+    --angular: #e11d48;
+    --angular-glow: rgba(225, 29, 72, 0.25);
+    --angular-gradient: linear-gradient(135deg, #f43f5e 0%, #be123c 100%);
+    --cyan: #38bdf8;
+    --cyan-soft: rgba(56, 189, 248, 0.15);
+    --emerald: #10b981;
+    --emerald-soft: rgba(16, 185, 129, 0.15);
+    --amber: #f59e0b;
+    --amber-soft: rgba(245, 158, 11, 0.15);
+    --purple: #a855f7;
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background:
+      radial-gradient(circle at 10% 10%, #1e1b4b 0%, transparent 45%),
+      radial-gradient(circle at 90% 20%, #4c0519 0%, transparent 40%),
+      radial-gradient(circle at 50% 80%, #0f172a 0%, transparent 50%),
+      var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+
+  a { color: inherit; text-decoration: none; }
+  ::selection { background: var(--angular-glow); color: var(--text); }
+
+  /* ---------- Container ---------- */
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 0 28px; }
+
+  /* ---------- Topbar ---------- */
+  nav.topbar {
+    position: sticky; top: 0; z-index: 50;
+    backdrop-filter: blur(12px);
+    background: rgba(15, 23, 42, 0.85);
+    border-bottom: 1px solid var(--panel-border);
+  }
+  nav.topbar .wrap {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: 14px; padding-bottom: 14px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-weight: 600; font-size: 14px; }
+  .brand .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--angular); box-shadow: 0 0 12px var(--angular); }
+  .navlinks { display: flex; gap: 20px; font-size: 13px; font-family: var(--font-mono); color: var(--text-dim); }
+  .navlinks a { transition: color .2s ease; }
+  .navlinks a:hover { color: var(--angular); }
+
+  /* ---------- Hero Section ---------- */
+  header.hero { padding: 60px 0 30px; position: relative; }
+  .eyebrow {
+    font-family: var(--font-mono); font-size: 12px; color: var(--angular);
+    letter-spacing: .14em; text-transform: uppercase; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .eyebrow::before { content: ''; width: 20px; height: 2px; background: var(--angular); display: inline-block; }
+  
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 700; line-height: 1.1; letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+  h1 span.gradient {
+    background: var(--angular-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero-sub { color: var(--text-dim); font-size: 17px; max-width: 68ch; }
+
+  .hero-tags {
+    display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px;
+  }
+  .tag {
+    font-family: var(--font-mono); font-size: 12px; padding: 5px 12px;
+    border-radius: 20px; border: 1px solid var(--panel-border);
+    background: rgba(30, 41, 59, 0.6); color: var(--text-dim);
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .tag.active { border-color: var(--angular); color: #fecdd3; background: var(--angular-glow); }
+  .tag.cyan { border-color: var(--cyan); color: #bae6fd; background: var(--cyan-soft); }
+  .tag.emerald { border-color: var(--emerald); color: #a7f3d0; background: var(--emerald-soft); }
+
+  /* ---------- Main Grid & Sections ---------- */
+  section { margin-top: 50px; }
+  .section-title {
+    font-family: var(--font-display); font-size: 22px; font-weight: 700;
+    margin-bottom: 20px; display: flex; align-items: center; gap: 10px;
+    color: var(--text);
+  }
+  .section-title .num {
+    font-family: var(--font-mono); font-size: 14px; color: var(--angular);
+    background: var(--angular-glow); border: 1px solid var(--angular);
+    width: 28px; height: 28px; border-radius: 6px; display: inline-flex;
+    align-items: center; justify-content: center;
+  }
+
+  /* Cards Grid */
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+
+  .card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--panel-border);
+    border-radius: 12px; padding: 22px;
+    transition: transform .2s ease, border-color .2s ease;
+  }
+  .card:hover { transform: translateY(-2px); border-color: var(--text-faint); }
+  .card.highlight { border-color: var(--angular); background: linear-gradient(180deg, rgba(225, 29, 72, 0.05) 0%, var(--bg-elevated) 100%); }
+
+  .card-title {
+    font-family: var(--font-display); font-size: 16px; font-weight: 600;
+    margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .card-desc { font-size: 14px; color: var(--text-dim); line-height: 1.5; }
+
+  /* Architecture Box */
+  .arch-box {
+    background: var(--bg-elevated); border: 1px solid var(--panel-border);
+    border-radius: 12px; padding: 24px; margin-top: 15px;
+  }
+  .arch-tree { font-family: var(--font-mono); font-size: 13px; color: var(--text-dim); line-height: 1.8; }
+  .arch-tree span.dir { color: var(--cyan); font-weight: 600; }
+  .arch-tree span.file { color: var(--text); }
+  .arch-tree span.note { color: var(--text-faint); font-style: italic; }
+
+  /* Table */
+  .table-container { overflow-x: auto; border: 1px solid var(--panel-border); border-radius: 10px; background: var(--bg-elevated); }
+  table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+  th { background: rgba(15, 23, 42, 0.8); font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); text-transform: uppercase; padding: 12px 16px; border-bottom: 1px solid var(--panel-border); }
+  td { padding: 14px 16px; border-bottom: 1px solid rgba(51, 65, 85, 0.5); color: var(--text); }
+  tr:last-child td { border-bottom: none; }
+  .badge-method { font-family: var(--font-mono); font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; display: inline-block; }
+  .badge-get { background: var(--cyan-soft); color: var(--cyan); border: 1px solid var(--cyan); }
+  .badge-post { background: var(--emerald-soft); color: var(--emerald); border: 1px solid var(--emerald); }
+  .badge-put { background: var(--amber-soft); color: var(--amber); border: 1px solid var(--amber); }
+  .badge-patch { background: rgba(168, 85, 247, 0.15); color: var(--purple); border: 1px solid var(--purple); }
+  .badge-delete { background: var(--angular-glow); color: #f43f5e; border: 1px solid var(--angular); }
+
+  /* Code snippet block */
+  .code-block {
+    background: #090d16; border: 1px solid var(--panel-border);
+    border-radius: 10px; padding: 18px; font-family: var(--font-mono);
+    font-size: 13px; color: #e2e8f0; overflow-x: auto; margin-top: 12px;
+  }
+  .code-block .kw { color: #f43f5e; font-weight: 600; }
+  .code-block .str { color: #38bdf8; }
+  .code-block .ann { color: #a855f7; }
+  .code-block .cm { color: var(--text-faint); font-style: italic; }
+
+  /* Phase Steps Timeline */
+  .timeline { position: relative; padding-left: 24px; border-left: 2px solid var(--panel-border); margin-top: 20px; }
+  .step-item { position: relative; margin-bottom: 30px; }
+  .step-item:last-child { margin-bottom: 0; }
+  .step-dot {
+    position: absolute; left: -31px; top: 2px; width: 12px; height: 12px;
+    border-radius: 50%; background: var(--bg); border: 2px solid var(--angular);
+  }
+  .step-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .step-title { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--text); }
+  .step-phase { font-family: var(--font-mono); font-size: 11px; padding: 2px 8px; border-radius: 4px; background: var(--angular-glow); color: #fecdd3; border: 1px solid var(--angular); }
+  .step-desc { font-size: 14px; color: var(--text-dim); }
+
+  /* Alert box */
+  .alert {
+    background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 10px; padding: 16px 20px; margin-top: 20px;
+    display: flex; gap: 14px; align-items: flex-start;
+  }
+  .alert-icon { color: var(--amber); font-size: 20px; line-height: 1; }
+  .alert-content { font-size: 14px; color: var(--text-dim); }
+  .alert-content strong { color: var(--text); }
+
+  footer {
+    margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--panel-border);
+    font-family: var(--font-mono); font-size: 12px; color: var(--text-faint); text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<nav class="topbar">
+  <div class="wrap">
+    <div class="brand">
+      <span class="dot"></span>
+      <span>TASK-MANAGER / ANGULAR FRONTEND</span>
+    </div>
+    <div class="navlinks">
+      <a href="#overview">Visão Geral</a>
+      <a href="#arquitetura">Arquitetura</a>
+      <a href="#componentes">Componentes</a>
+      <a href="#backend-cors">CORS Backend</a>
+      <a href="#cronograma">Cronograma</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">Plano Estruturado de Engenharia Frontend</div>
+    <h1>Implementação do Frontend em <span class="gradient">Angular 18+</span></h1>
+    <p class="hero-sub">
+      Planejamento técnico completo para a construção de uma interface moderna, reativa e de alta performance conectada à API Spring Boot do Task Manager.
+    </p>
+
+    <div class="hero-tags">
+      <span class="tag active">Angular 18+ Standalone</span>
+      <span class="tag cyan">Signals & RxJS</span>
+      <span class="tag emerald">Reactive Forms</span>
+      <span class="tag">Glassmorphism UI</span>
+      <span class="tag">Spring Boot REST Integration</span>
+    </div>
+  </header>
+
+  <!-- SECTION 1: VISÃO GERAL -->
+  <section id="overview">
+    <div class="section-title">
+      <span class="num">01</span>
+      <span>Visão Geral & Stack Tecnológica</span>
+    </div>
+
+    <div class="grid-3">
+      <div class="card highlight">
+        <div class="card-title">
+          <span>Angular Standalone</span>
+          <span style="color: var(--angular); font-size: 12px; font-weight: bold;">v18+</span>
+        </div>
+        <p class="card-desc">
+          Arquitetura sem <code>NgModule</code> legados. Componentes, diretivas e pipes autônomos para menor bundle, maior modularidade e carregamento otimizado.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span>Reatividade & Estado</span>
+          <span style="color: var(--cyan); font-size: 12px; font-weight: bold;">Signals / RxJS</span>
+        </div>
+        <p class="card-desc">
+          Uso de <code>Angular Signals</code> para estado reativo local e fine-grained reactivity, combinado com <code>RxJS</code> e <code>HttpClient</code> para fluxo de chamadas assíncronas HTTP.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span>Design System Moderno</span>
+          <span style="color: var(--emerald); font-size: 12px; font-weight: bold;">Vanilla CSS</span>
+        </div>
+        <p class="card-desc">
+          Interface em Dark Mode com tema customizado, CSS Variables para tokens de design, efeitos de glassmorphism, skeletons de carregamento e animações de micro-interação.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: ESTRUTURA DE PASTAS -->
+  <section id="arquitetura">
+    <div class="section-title">
+      <span class="num">02</span>
+      <span>Estrutura de Arquivos e Módulos</span>
+    </div>
+
+    <p style="color: var(--text-dim); margin-bottom: 16px;">
+      A organização do projeto seguirá a convenção oficial Angular de Feature Driven / Core-Shared Architecture:
+    </p>
+
+    <div class="arch-box">
+      <div class="arch-tree">
+        <span class="dir">src/app/</span><br>
+        ├── <span class="dir">core/</span> <span class="note">(Serviços singleton, interceptors, modelos de dados)</span><br>
+        │   ├── <span class="dir">models/</span><br>
+        │   │   ├── <span class="file">task.model.ts</span> <span class="note">(Interfaces Task, TaskRequestDTO, TaskResponseDTO)</span><br>
+        │   ├── <span class="dir">services/</span><br>
+        │   │   ├── <span class="file">task.service.ts</span> <span class="note">(Comunicação HTTP com Spring Boot API)</span><br>
+        │   │   └── <span class="file">notification.service.ts</span> <span class="note">(Alertas Toast para feedback visual)</span><br>
+        │   └── <span class="dir">interceptors/</span><br>
+        │       └── <span class="file">error.interceptor.ts</span> <span class="note">(Tratamento global de erros HTTP 404, 400, 500)</span><br>
+        ├── <span class="dir">features/tasks/</span> <span class="note">(Funcionalidade principal do Task Manager)</span><br>
+        │   ├── <span class="dir">components/</span><br>
+        │   │   ├── <span class="file">task-dashboard/</span> <span class="note">(Página principal com estatísticas e filtros)</span><br>
+        │   │   ├── <span class="file">task-list/</span> <span class="note">(Tabela/Grid de tarefas com filtros reativos)</span><br>
+        │   │   ├── <span class="file">task-card/</span> <span class="note">(Card individual com toggle de conclusão rápido)</span><br>
+        │   │   ├── <span class="file">task-form-modal/</span> <span class="note">(Modal de criação e edição via Reactive Forms)</span><br>
+        │   │   └── <span class="file">task-stats/</span> <span class="note">(Cards de resumo: total, pendentes, concluídas)</span><br>
+        ├── <span class="dir">shared/</span> <span class="note">(Componentes reutilizáveis como botões, modais, spinners)</span><br>
+        │   └── <span class="dir">components/</span><br>
+        │       ├── <span class="file">header/</span><br>
+        │       ├── <span class="file">toast/</span><br>
+        │       └── <span class="file">loading-skeleton/</span><br>
+        ├── <span class="file">environments/</span><br>
+        │   ├── <span class="file">environment.ts</span> <span class="note">(apiUrl: 'http://localhost:8080')</span><br>
+        │   └── <span class="file">environment.prod.ts</span><br>
+        └── <span class="file">app.routes.ts</span> &amp; <span class="file">app.config.ts</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: COMPONENTES & REQUISITOS DE UI -->
+  <section id="componentes">
+    <div class="section-title">
+      <span class="num">03</span>
+      <span>Mapeamento de Componentes da Interface</span>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">
+          <span>1. Task Dashboard &amp; Stats Header</span>
+        </div>
+        <p class="card-desc">
+          Exibição centralizada de indicadores reativos (Signals): Total de tarefas, tarefas pendentes e concluídas em tempo real com barra de progresso visual.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span>2. Task List &amp; Quick Toggle</span>
+        </div>
+        <p class="card-desc">
+          Listagem fluida com suporte a busca instantânea por título e filtro por status (Todas, Pendentes, Concluídas). Botão direto para alternar o status via endpoint <code>PATCH /tasks/{id}/concluir</code>.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span>3. Task Form Modal (Criar / Editar)</span>
+        </div>
+        <p class="card-desc">
+          Formulário reativo com validação de campo obrigatório para <strong>título</strong> (sincronizado com <code>@NotBlank</code> do Spring), campo opcional para descrição e feedback visual imediato.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span>4. Toast Notifications &amp; Error Handling</span>
+        </div>
+        <p class="card-desc">
+          Notificações elegantes para confirmações de sucesso (Ex: "Tarefa criada com sucesso!", "Status atualizado") e alertas de erro HTTP extraídos das exceções personalizadas do Spring Boot.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4: REQUISITO ESSENCIAL - CORS NO BACKEND SPRING BOOT -->
+  <section id="backend-cors">
+    <div class="section-title">
+      <span class="num">04</span>
+      <span>Ajuste Necessário no Backend: Configuração de CORS</span>
+    </div>
+
+    <div class="alert">
+      <div class="alert-icon">⚠️</div>
+      <div class="alert-content">
+        <strong>Atenção para Integração HTTP:</strong> O Angular será executado por padrão em <code>http://localhost:4200</code>. Para permitir requisições sem bloqueio de políticas de mesma origem (CORS), o backend Spring Boot precisa liberar as requisições oriundas dessa URL.
+      </div>
+    </div>
+
+    <p style="color: var(--text-dim); margin-top: 16px;">
+      Recomendamos adiantar a inclusão da anotação <code>@CrossOrigin</code> no <code>TaskController.java</code> do backend Spring Boot:
+    </p>
+
+    <div class="code-block">
+<span class="ann">@RestController</span>
+<span class="ann">@RequestMapping</span>(<span class="str">"/tasks"</span>)
+<span class="ann">@CrossOrigin</span>(origins = <span class="str">"http://localhost:4200"</span>) <span class="cm">// Permite a conexão do Angular</span>
+<span class="kw">public class</span> TaskController {
+    <span class="cm">// ... métodos da controller ...</span>
+}
+    </div>
+  </section>
+
+  <!-- SECTION 5: INTEGRAÇÃO COM ENDPOINTS -->
+  <section id="endpoints">
+    <div class="section-title">
+      <span class="num">05</span>
+      <span>Mapeamento Angular HTTP Service &amp; Endpoints REST</span>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Método HTTP</th>
+            <th>Endpoint Backend</th>
+            <th>Método em TaskService (Angular)</th>
+            <th>Descrição e Retorno</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge-method badge-get">GET</span></td>
+            <td><code>/tasks</code></td>
+            <td><code>getTasks(): Observable&lt;TaskResponseDTO[]&gt;</code></td>
+            <td>Lista todas as tarefas para popular a Dashboard.</td>
+          </tr>
+          <tr>
+            <td><span class="badge-method badge-post">POST</span></td>
+            <td><code>/tasks</code></td>
+            <td><code>createTask(dto: TaskRequestDTO): Observable&lt;TaskResponseDTO&gt;</code></td>
+            <td>Cria uma nova tarefa a partir do formulário reativo.</td>
+          </tr>
+          <tr>
+            <td><span class="badge-method badge-get">GET</span></td>
+            <td><code>/tasks/{id}</code></td>
+            <td><code>getTaskById(id: number): Observable&lt;TaskResponseDTO&gt;</code></td>
+            <td>Carrega os detalhes de uma tarefa específica para edição.</td>
+          </tr>
+          <tr>
+            <td><span class="badge-method badge-put">PUT</span></td>
+            <td><code>/tasks/{id}</code></td>
+            <td><code>updateTask(id: number, dto: TaskRequestDTO)</code></td>
+            <td>Atualiza título e descrição da tarefa.</td>
+          </tr>
+          <tr>
+            <td><span class="badge-method badge-patch">PATCH</span></td>
+            <td><code>/tasks/{id}/concluir</code></td>
+            <td><code>toggleTaskCompletion(id: number)</code></td>
+            <td>Alterna o status da tarefa entre concluída/pendente.</td>
+          </tr>
+          <tr>
+            <td><span class="badge-method badge-delete">DELETE</span></td>
+            <td><code>/tasks/{id}</code></td>
+            <td><code>deleteTask(id: number): Observable&lt;void&gt;</code></td>
+            <td>Exclui a tarefa cadastrada.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SECTION 6: CRONOGRAMA DE IMPLEMENTAÇÃO -->
+  <section id="cronograma">
+    <div class="section-title">
+      <span class="num">06</span>
+      <span>Cronograma de Execução Fase a Fase</span>
+    </div>
+
+    <div class="timeline">
+      <div class="step-item">
+        <div class="step-dot"></div>
+        <div class="step-header">
+          <span class="step-title">Fase 1: Setup do Projeto Angular &amp; Configurações Base</span>
+          <span class="step-phase">Fase 1</span>
+        </div>
+        <p class="step-desc">
+          Criação do projeto usando Angular CLI (<code>ng new task-manager-frontend --standalone</code>), definição dos tokens CSS de tema escuro e criação das variáveis de ambiente (<code>environments/environment.ts</code>).
+        </p>
+      </div>
+
+      <div class="step-item">
+        <div class="step-dot"></div>
+        <div class="step-header">
+          <span class="step-title">Fase 2: Modelos de Dados &amp; Camada de Serviços HTTP</span>
+          <span class="step-phase">Fase 2</span>
+        </div>
+        <p class="step-desc">
+          Criação das interfaces TypeScript (<code>Task</code>, <code>TaskRequestDTO</code>, <code>TaskResponseDTO</code>), implementação do <code>TaskService</code> utilizando <code>HttpClient</code> e configuração do tratamento centralizado de erros.
+        </p>
+      </div>
+
+      <div class="step-item">
+        <div class="step-dot"></div>
+        <div class="step-header">
+          <span class="step-title">Fase 3: Layout Base, Topbar &amp; Componente de Estatísticas</span>
+          <span class="step-phase">Fase 3</span>
+        </div>
+        <p class="step-desc">
+          Desenvolvimento do layout container, header responsivo, cards de estatísticas (Total, Pendentes, Concluídas) alimentados por <code>Angular Signals</code>.
+        </p>
+      </div>
+
+      <div class="step-item">
+        <div class="step-dot"></div>
+        <div class="step-header">
+          <span class="step-title">Fase 4: Listagem de Tarefas, Filtros &amp; Conclusão Rápida</span>
+          <span class="step-phase">Fase 4</span>
+        </div>
+        <p class="step-desc">
+          Implementação do componente de lista/grid de tarefas, inclusão da busca por texto em tempo real, filtros por status e integração com o botão de toggle <code>concluir</code>.
+        </p>
+      </div>
+
+      <div class="step-item">
+        <div class="step-dot"></div>
+        <div class="step-header">
+          <span class="step-title">Fase 5: Form Modal com Reactive Forms (Criar &amp; Editar)</span>
+          <span class="step-phase">Fase 5</span>
+        </div>
+        <p class="step-desc">
+          Construção do modal com formulário reativo, validações dos campos, suporte para criação de novas tarefas e edição de tarefas existentes.
+        </p>
+      </div>
+
+      <div class="step-item">
+        <div class="step-dot"></div>
+        <div class="step-header">
+          <span class="step-title">Fase 6: Polimento Visual, CORS &amp; Testes Finais de Integração</span>
+          <span class="step-phase">Fase 6</span>
+        </div>
+        <p class="step-desc">
+          Ajuste fino da configuração de CORS no Spring Boot backend, inclusão de micro-animações, estados de carregamento (Skeleton loaders) e testes end-to-end de integração HTTP.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 7: COMANDOS CLI -->
+  <section id="comandos">
+    <div class="section-title">
+      <span class="num">07</span>
+      <span>Comandos para Inicialização Rápida</span>
+    </div>
+
+    <div class="code-block">
+<span class="cm"># 1. Instalar o Angular CLI (caso ainda não tenha instalado)</span>
+npm install -g @angular/cli
+
+<span class="cm"># 2. Criar a aplicação Angular Standalone na pasta de projetos</span>
+ng new task-manager-frontend --standalone --routing --style=css
+
+<span class="cm"># 3. Navegar para a pasta criada</span>
+cd task-manager-frontend
+
+<span class="cm"># 4. Gerar os modelos, serviços e componentes principais</span>
+ng g service core/services/task
+ng g interface core/models/task
+ng g component features/tasks/components/task-dashboard
+ng g component features/tasks/components/task-list
+ng g component features/tasks/components/task-form-modal
+
+<span class="cm"># 5. Executar o servidor de desenvolvimento</span>
+ng serve
+    </div>
+  </section>
+
+  <footer>
+    Relatório de Planejamento Frontend Angular · Conectado com Task Manager REST API (Spring Boot &amp; Java 21)
+  </footer>
+
+</div>
+
+</body>
+</html>
