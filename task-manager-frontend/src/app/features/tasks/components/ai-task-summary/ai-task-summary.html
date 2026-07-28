@@ -3,7 +3,7 @@
         <div class="title-with-badge">
             <span class="ai-icon">✨</span>
             <h3>Resumo Inteligente</h3>
-            <span class="badge badge-purple">🤖 Qwen 2.5 (Local)</span>
+            <span class="badge badge-purple">✨ Groq Llama 3.3</span>
         </div>
 
         <button class="btn btn-sparkle" (click)="fetchSummary()" [disabled]="loading()">
@@ -18,12 +18,6 @@
     @if (summary(); as data) {
     <div class="ai-summary-content">
         <p class="summary-text">{{ data.resumo }}</p>
-        @if (data.statusConexao === 'OFFLINE') {
-        <div class="alert alert-warning">
-            💡 <strong>Dica:</strong> Para gerar novos resumos, certifique-se de executar no terminal:
-            <code>ollama run qwen2.5:1.5b</code>
-        </div>
-        }
     </div>
     }
 </div>

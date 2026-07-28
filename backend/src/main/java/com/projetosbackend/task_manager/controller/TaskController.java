@@ -3,7 +3,7 @@ package com.projetosbackend.task_manager.controller;
 import com.projetosbackend.task_manager.dto.AiSummaryDTO;
 import com.projetosbackend.task_manager.dto.TaskRequestDTO;
 import com.projetosbackend.task_manager.dto.TaskResponseDTO;
-import com.projetosbackend.task_manager.service.LocalAiService;
+import com.projetosbackend.task_manager.service.GeminiAIService;
 import com.projetosbackend.task_manager.service.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -17,17 +17,17 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:4200")
 public class TaskController {
     private final TaskService taskService;
-    private final LocalAiService localAiService;
+    private final GeminiAIService geminiAiService;
 
-    public TaskController(TaskService taskService, LocalAiService localAiService) {
+    public TaskController(TaskService taskService, GeminiAIService geminiAiService) {
 
         this.taskService = taskService;
-        this.localAiService = localAiService;
+        this.geminiAiService = geminiAiService;
     }
 
     @GetMapping("/ai/summary")
     public ResponseEntity<AiSummaryDTO> obterResumoIa() {
-        AiSummaryDTO resumo = localAiService.gerarResumoTarefas();
+        AiSummaryDTO resumo = geminiAiService.gerarResumoTarefas();
         return ResponseEntity.ok(resumo);
     }
 

@@ -8,23 +8,25 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
-public class LocalAiService {
+public class GeminiAIService {
 
     private final TaskRepository taskRepository;
     private final RestClient restClient;
 
-    @Value("${ollama.api.url}")
-    private String ollamaUrl;
+    @Value("${ai.api.url}")
+    private String apiUrl;
 
-    @Value("${ollama.model}")
-    private String ollamaModel;
+    @Value("${ai.api.key}")
+    private String apiKey;
 
-    public LocalAiService(TaskRepository taskRepository) {
+    @Value("${ai.api.model}")
+    private String apiModel;
+
+    public GeminiAIService(TaskRepository taskRepository) {
         this.taskRepository = taskRepository;
         this.restClient = RestClient.create();
     }
@@ -33,7 +35,7 @@ public class LocalAiService {
         List<Task> tarefas = taskRepository.findAll();
 
         if (tarefas.isEmpty()) {
-            return new AiSummaryDTO("Nenhuma tarefa encontrada. Cadastre tarefas para que a IA possa gerar uma análise!", "SEM_TAREFAS");
+            return new AiSummaryDTO("Nenhuma tarefa encontrada. Cadastre tarefas para gerar a análise!", "SEM_TAREFAS");
         }
 
         long concluidas = tarefas.stream().filter(Task::isConcluida).count();
@@ -56,31 +58,53 @@ public class LocalAiService {
                 + "Destaque o progresso atual e dê uma dica motivacional rápida para focar nas tarefas pendentes.\n\n"
                 + sb.toString();
 
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("model", ollamaModel);
-        requestBody.put("prompt", prompt);
-        requestBody.put("stream", false);
+        // Estrutura de JSON compatível com OpenAI/Groq API
+        Map<String, Object> userMessage = Map.of("role", "user", "content", prompt);
+        Map<String, Object> requestBody = Map.of(
+                "model", apiModel,
+                "messages", List.of(userMessage),
+                "max_tokens", 500
+        );
 
         try {
             @SuppressWarnings("unchecked")
             Map<String, Object> response = restClient.post()
-                    .uri(ollamaUrl)
+                    .uri(apiUrl)
+                    .header("Authorization", "Bearer " + apiKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(requestBody)
                     .retrieve()
                     .body(Map.class);
 
-            if (response != null && response.containsKey("response")) {
-                String resumoGerado = (String) response.get("response");
-                return new AiSummaryDTO(resumoGerado.trim(), "ONLINE");
-            } else {
-                return new AiSummaryDTO("Não foi possível processar a resposta da IA.", "ERRO");
-            }
+            String resumoExtraido = extrairTextoResposta(response);
+            return new AiSummaryDTO(resumoExtraido, "ONLINE");
+
         } catch (Exception e) {
+            System.err.println("❌ Erro detalhado na chamada à API de IA: " + e.getMessage());
+            e.printStackTrace();
             return new AiSummaryDTO(
-                    "O servidor de IA local (Ollama) parece estar desligado ou indisponível. Certifique-se de que o comando 'ollama run qwen2.5:1.5b' está em execução.",
-                    "OFFLINE"
+                    "Erro ao se conectar com a API de IA: " + e.getMessage(),
+                    "ERRO_API"
             );
         }
+    }
+
+    /**
+     * Método auxiliar para navegar pelo JSON retornado da API (formato OpenAI/Groq)
+     */
+    @SuppressWarnings("unchecked")
+    private String extrairTextoResposta(Map<String, Object> response) {
+        try {
+            List<Map<String, Object>> choices = (List<Map<String, Object>>) response.get("choices");
+            if (choices != null && !choices.isEmpty()) {
+                Map<String, Object> message = (Map<String, Object>) choices.get(0).get("message");
+                if (message != null) {
+                    return (String) message.get("content");
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Erro ao parsear JSON da API: " + e.getMessage());
+        }
+        return "Resumo gerado, porém o formato da resposta veio diferente do esperado.";
     }
 }
