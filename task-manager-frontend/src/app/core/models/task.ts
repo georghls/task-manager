@@ -26,3 +26,7 @@ export interface TaskResponseDTO {
     dataCriacao?: string;
 }
 
+export interface AiSummaryResponseDTO {
+    resumo: string;
+    statusConexao: 'ONLINE' | 'OFFLINE' | 'SEM_TAREFAS' | 'ERRO';
+}

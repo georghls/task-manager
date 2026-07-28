@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { TaskRequestDTO, TaskResponseDTO } from '../models/task';
+import { AiSummaryResponseDTO, TaskRequestDTO, TaskResponseDTO } from '../models/task';
 import { environment } from '../../../environments/environments'; // Ajuste o caminho se seu arquivo for environment.ts
 
 @Injectable({
@@ -61,4 +61,12 @@ export class TaskService {
     deleteTask(id: number): Observable<void> {
         return this.http.delete<void>(`${this.apiUrl}/${id}`);
     }
+    /**
+     * GET /tasks/ai/summary
+     * Obtém o resumo gerado pela IA local (Ollama / Qwen2.5)
+     */
+    getAiSummary(): Observable<AiSummaryResponseDTO> {
+        return this.http.get<AiSummaryResponseDTO>(`${this.apiUrl}/ai/summary`);
+    }
+
 }

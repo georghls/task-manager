@@ -3,11 +3,12 @@ import { TaskService } from '../../../../core/services/task';
 import { TaskRequestDTO, TaskResponseDTO } from '../../../../core/models/task';
 import { TaskList } from '../task-list/task-list';
 import { TaskFormModal } from '../task-form-modal/task-form-modal';
+import { AiTaskSummary } from '../ai-task-summary/ai-task-summary';
 
 @Component({
   selector: 'app-task-dashboard',
   standalone: true,
-  imports: [TaskList, TaskFormModal],
+  imports: [TaskList, TaskFormModal, AiTaskSummary],
   templateUrl: './task-dashboard.html',
   styleUrl: './task-dashboard.css',
 })
