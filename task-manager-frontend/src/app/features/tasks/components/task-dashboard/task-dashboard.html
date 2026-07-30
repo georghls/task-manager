@@ -1,42 +1,38 @@
 <div class="dashboard-header">
     <div class="title-group">
         <h1>Painel de <span class="highlight">Tarefas</span></h1>
-        <p class="subtitle">Gerencie suas atividades com eficiência e acompanhe o progresso em tempo real.</p>
+        <p class="subtitle">Gerencie suas atividades com simplicidade e acompanhe o progresso em tempo real.</p>
     </div>
 
     <!-- Botão para abrir o Modal de Nova Tarefa -->
-    <button class="btn btn-primary" (click)="openCreateModal()">
-        ✨ + Nova Tarefa
+    <button class="btn btn-primary btn-create" (click)="openCreateModal()">
+        ➕ Nova Tarefa
     </button>
 </div>
 
-<app-ai-task-summary></app-ai-task-summary>
-<app-ai-task-generator (tasksGenerated)="loadTasks()"></app-ai-task-generator>
-
-
 <div class="stats-grid">
-    <div class="glass-card stat-card">
+    <div class="vintage-card stat-card card-blue">
         <div class="stat-header">
             <span class="stat-title">Total de Tarefas</span>
-            <span class="stat-icon pink">📊</span>
+            <span class="stat-icon">📊</span>
         </div>
         <div class="stat-value">{{ totalTasks() }}</div>
-        <div class="stat-footer">Tarefas cadastradas no sistema</div>
+        <div class="stat-footer">Tarefas no sistema</div>
     </div>
 
-    <div class="glass-card stat-card">
+    <div class="vintage-card stat-card card-yellow">
         <div class="stat-header">
             <span class="stat-title">Pendentes</span>
-            <span class="stat-icon amber">⏳</span>
+            <span class="stat-icon">⏳</span>
         </div>
         <div class="stat-value">{{ pendingTasks() }}</div>
         <div class="stat-footer">Aguardando conclusão</div>
     </div>
 
-    <div class="glass-card stat-card">
+    <div class="vintage-card stat-card card-sage">
         <div class="stat-header">
             <span class="stat-title">Concluídas</span>
-            <span class="stat-icon emerald">✅</span>
+            <span class="stat-icon">✅</span>
         </div>
         <div class="stat-value">{{ completedTasks() }}</div>
         <div class="stat-footer">Finalizadas com sucesso</div>
@@ -52,3 +48,44 @@
 <app-task-form-modal [taskToEdit]="taskToEdit()" (saveTask)="handleSaveTask($event)"
     (closeModal)="closeModal()"></app-task-form-modal>
 }
+
+<!-- Assistente de IA Flutuante -->
+<div class="ai-assistant-wrapper">
+    <!-- Balão/Painel do Assistente -->
+    @if (isAiPanelOpen()) {
+    <div class="vintage-card ai-assistant-panel">
+        <div class="panel-header">
+            <div class="panel-title-group">
+                <span class="panel-icon">📠</span>
+                <h3>Assistente de IA</h3>
+            </div>
+            <button class="btn-close-panel" (click)="toggleAiPanel()" title="Fechar Assistente">✕</button>
+        </div>
+
+        <!-- Abas de Navegação -->
+        <div class="panel-tabs">
+            <button class="tab-btn" [class.active]="activeAiTab() === 'summary'" (click)="setAiTab('summary')">
+                📋 Resumo Geral
+            </button>
+            <button class="tab-btn" [class.active]="activeAiTab() === 'generator'" (click)="setAiTab('generator')">
+                ⚙️ Gerador Automático
+            </button>
+        </div>
+
+        <!-- Conteúdo da Aba Ativa -->
+        <div class="panel-content">
+            @if (activeAiTab() === 'summary') {
+            <app-ai-task-summary></app-ai-task-summary>
+            }
+            @if (activeAiTab() === 'generator') {
+            <app-ai-task-generator (tasksGenerated)="loadTasks()"></app-ai-task-generator>
+            }
+        </div>
+    </div>
+    }
+
+    <!-- Botão de Gatilho Redondo Flutuante -->
+    <button class="btn-ai-trigger" (click)="toggleAiPanel()" [class.panel-active]="isAiPanelOpen()" title="Assistente de IA">
+        📠
+    </button>
+</div>

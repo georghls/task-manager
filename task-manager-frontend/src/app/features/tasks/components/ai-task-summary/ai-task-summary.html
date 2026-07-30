@@ -1,16 +1,15 @@
-<div class="glass-card ai-summary-card">
+<div class="vintage-card ai-summary-card">
     <div class="ai-summary-header">
         <div class="title-with-badge">
-            <span class="ai-icon">✨</span>
+            <span class="ai-icon">📜</span>
             <h3>Resumo Inteligente</h3>
-            <span class="badge badge-purple">✨ Groq Llama 3.3</span>
         </div>
 
         <button class="btn btn-sparkle" (click)="fetchSummary()" [disabled]="loading()">
             @if (loading()) {
-            <span class="spinner">⏳</span> Processando...
+            <span class="spinner">⏳</span> Datilografando...
             } @else {
-            ✨ {{ summary() ? 'Atualizar Resumo' : 'Gerar Resumo com IA' }}
+            ✒️ {{ summary() ? 'Atualizar Resumo' : 'Gerar Resumo IA' }}
             }
         </button>
     </div>

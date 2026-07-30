@@ -1,15 +1,15 @@
-<div class="list-controls glass-card">
+<div class="vintage-card list-controls">
     <!-- Campo de Busca por Texto -->
     <div class="search-box">
         <span class="search-icon">🔍</span>
-        <input type="text" placeholder="Pesquisar por título ou descrição..." [value]="searchTerm()"
+        <input type="text" placeholder="Filtrar catálogo de tarefas..." [value]="searchTerm()"
             (input)="onSearchChange($event)" class="search-input" />
     </div>
 
     <!-- Botões de Filtro por Status -->
     <div class="filter-pills">
         <button class="pill-btn" [class.active]="filterStatus() === 'ALL'" (click)="setFilter('ALL')">
-            Todas
+            Ver Todas
         </button>
         <button class="pill-btn" [class.active]="filterStatus() === 'PENDING'" (click)="setFilter('PENDING')">
             Pendentes
@@ -23,7 +23,7 @@
 <!-- Lista de Tarefas (Usando o bloco reativo @for do Angular 18+) -->
 <div class="task-grid">
     @for (task of filteredTasks(); track task.id) {
-    <div class="glass-card task-card" [class.completed]="task.concluida">
+    <div class="vintage-card task-card" [class.completed]="task.concluida">
         <div class="task-content">
             <div class="task-header">
                 <h3 class="task-title">{{ task.titulo }}</h3>
@@ -38,30 +38,29 @@
         </div>
 
         <div class="task-actions">
+            <!-- Botão Concluir / Desmarcar -->
+            <button class="btn btn-action" [class.btn-toggle-done]="!task.concluida"
+                [class.btn-toggle-undo]="task.concluida" (click)="onToggle(task.id)"
+                [title]="task.concluida ? 'Marcar como pendente' : 'Concluir tarefa'">
+                {{ task.concluida ? '↩️ Pendente' : '✓ Concluir' }}
+            </button>
 
             <!-- Botão Editar -->
-            <button class="btn-action btn-edit" (click)="onEdit(task)" title="Editar tarefa">
+            <button class="btn btn-action btn-edit" (click)="onEdit(task)" title="Editar tarefa">
                 ✏️ Editar
             </button>
 
-            <!-- Botão Concluir / Desmarcar -->
-            <button class="btn-action" [class.btn-toggle-done]="!task.concluida"
-                [class.btn-toggle-undo]="task.concluida" (click)="onToggle(task.id)"
-                [title]="task.concluida ? 'Marcar como pendente' : 'Concluir tarefa'">
-                {{ task.concluida ? '↩️ Desfazer' : '✅ Concluir' }}
-            </button>
-
             <!-- Botão Excluir -->
-            <button class="btn-action btn-delete" (click)="onDelete(task.id)" title="Excluir tarefa">
+            <button class="btn btn-action btn-delete" (click)="onDelete(task.id)" title="Excluir tarefa">
                 🗑️ Excluir
             </button>
         </div>
     </div>
     } @empty {
-    <div class="glass-card empty-state">
+    <div class="vintage-card empty-state">
         <div class="empty-icon">📭</div>
-        <h3>Nenhuma tarefa encontrada</h3>
-        <p>Tente ajustar seus termos de busca ou filtros.</p>
+        <h3>Arquivo vazio</h3>
+        <p>Nenhuma tarefa localizada para os filtros atuais.</p>
     </div>
     }
 </div>

@@ -2,9 +2,8 @@
     position: fixed;
     inset: 0;
     z-index: 1000;
-    background: rgba(11, 15, 25, 0.75);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: rgba(43, 45, 47, 0.55);
+    backdrop-filter: blur(4px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -16,8 +15,11 @@
     width: 100%;
     max-width: 500px;
     padding: 28px;
-    animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    background: var(--bg-surface);
+    border: 2px solid var(--border-color);
+    box-shadow: 8px 8px 0px var(--border-color);
+    border-radius: var(--radius-lg);
+    animation: slideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .modal-header {
@@ -26,29 +28,32 @@
     align-items: center;
     margin-bottom: 20px;
     padding-bottom: 12px;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 2px dashed var(--border-color);
 }
 
 .modal-header h2 {
     font-family: var(--font-display);
-    font-size: 20px;
-    font-weight: 700;
+    font-size: 22px;
+    font-weight: 800;
     color: var(--text-primary);
 }
 
 .btn-close {
     background: transparent;
-    border: none;
-    color: var(--text-muted);
-    font-size: 18px;
+    border: 2px solid transparent;
+    color: var(--text-secondary);
+    font-size: 16px;
+    font-weight: bold;
     cursor: pointer;
     padding: 4px 8px;
     border-radius: var(--radius-sm);
-    transition: color 0.2s ease;
+    transition: all 0.15s ease;
 }
 
 .btn-close:hover {
-    color: var(--accent-pink);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+    background: var(--bg-primary);
 }
 
 .modal-form {
@@ -65,44 +70,46 @@
 
 .form-label {
     font-family: var(--font-display);
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
 }
 
 .required {
-    color: var(--accent-pink);
+    color: #c2574e;
 }
 
 .form-input,
 .form-textarea {
     width: 100%;
     padding: 10px 14px;
-    background: rgba(15, 23, 42, 0.7);
-    border: 1px solid var(--border-color);
+    background: var(--bg-primary);
+    border: 2px solid var(--border-color);
     border-radius: var(--radius-sm);
     color: var(--text-primary);
     font-family: var(--font-body);
     font-size: 14px;
     outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: all 0.15s ease;
 }
 
 .form-input:focus,
 .form-textarea:focus {
-    border-color: var(--accent-pink);
-    box-shadow: 0 0 12px var(--accent-pink-glow);
+    background: var(--bg-surface);
+    box-shadow: 3px 3px 0px var(--border-color);
 }
 
 .form-input.is-invalid {
-    border-color: var(--accent-pink);
+    background: #fff8f8;
+    border-color: #c2574e;
 }
 
 .error-msg {
-    font-size: 12px;
-    color: #f87171;
+    font-size: 11px;
+    color: #c2574e;
     font-family: var(--font-mono);
     margin-top: 2px;
+    font-weight: bold;
 }
 
 .modal-footer {
@@ -111,25 +118,19 @@
     gap: 12px;
     margin-top: 10px;
     padding-top: 16px;
-    border-top: 1px solid var(--border-color);
+    border-top: 2px dashed var(--border-color);
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 @keyframes slideUp {
     from {
-        transform: translateY(20px);
+        transform: translateY(16px);
         opacity: 0;
     }
-
     to {
         transform: translateY(0);
         opacity: 1;

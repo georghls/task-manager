@@ -27,6 +27,10 @@ export class TaskDashboard implements OnInit {
   isModalOpen = signal<boolean>(false);
   taskToEdit = signal<TaskResponseDTO | null>(null);
 
+  // Signals para controlar a visibilidade e abas do Assistente de IA flutuante
+  isAiPanelOpen = signal<boolean>(false);
+  activeAiTab = signal<'summary' | 'generator'>('summary');
+
   // Signals computados automaticamente com base na lista 'tasks'
   totalTasks = computed(() => this.tasks().length);
   pendingTasks = computed(() => this.tasks().filter(t => !t.concluida).length);
@@ -111,5 +115,14 @@ export class TaskDashboard implements OnInit {
       next: () => this.loadTasks(), // Recarrega as tarefas atualizadas
       error: (err) => console.error('Erro ao excluir tarefa:', err)
     });
+  }
+
+  // Métodos de controle do Painel de IA
+  toggleAiPanel(): void {
+    this.isAiPanelOpen.update(val => !val);
+  }
+
+  setAiTab(tab: 'summary' | 'generator'): void {
+    this.activeAiTab.set(tab);
   }
 }

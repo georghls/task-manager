@@ -1,15 +1,14 @@
-<div class="glass-card ai-generator-card">
+<div class="vintage-card ai-generator-card">
     <div class="ai-generator-header">
         <div class="title-with-badge">
-            <span class="ai-icon">🤖</span>
-            <h3>Gerador de Tarefas com IA</h3>
-            <span class="badge badge-blue">✨ Groq Llama 3.3</span>
+            <span class="ai-icon">📠</span>
+            <h3>Gerador de Tarefas Inteligente</h3>
         </div>
     </div>
 
     <div class="ai-generator-body">
         <p class="ai-description">
-            Descreva em texto livre o que você precisa fazer. A IA vai interpretar e criar as tarefas automaticamente!
+            Escreva o que você precisa realizar. O assistente irá processar e catalogar as tarefas correspondentes automaticamente.
         </p>
 
         <textarea class="ai-textarea" [ngModel]="userPrompt()" (ngModelChange)="userPrompt.set($event)"
@@ -18,16 +17,16 @@
 
         <button class="btn btn-generate" (click)="generateTasks()" [disabled]="loading() || !userPrompt().trim()">
             @if (loading()) {
-            <span class="spinner">⏳</span> Gerando tarefas...
+            <span class="spinner">⏳</span> Processando Dados...
             } @else {
-            🤖 Gerar Tarefas com IA
+            ⚙️ Processar e Catalogar
             }
         </button>
     </div>
 
     @if (result(); as data) {
     <div class="ai-result success">
-        <p class="result-message">{{ data.mensagem }}</p>
+        <p class="result-message">✓ {{ data.mensagem }}</p>
         <ul class="generated-tasks-list">
             @for (tarefa of data.tarefasCriadas; track tarefa.id) {
             <li>
@@ -43,7 +42,7 @@
 
     @if (errorMessage(); as errMsg) {
     <div class="ai-result error">
-        <p>❌ {{ errMsg }}</p>
+        <p>⚠️ {{ errMsg }}</p>
     </div>
     }
 </div>

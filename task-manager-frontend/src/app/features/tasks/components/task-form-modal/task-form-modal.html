@@ -1,11 +1,11 @@
 <!-- Fundo escuro com desfoque (Backdrop) -->
 <div class="modal-backdrop" (click)="onCancel()">
     <!-- Cartão suspenso do Modal (Impede que o clique interno feche o modal) -->
-    <div class="glass-card modal-container" (click)="$event.stopPropagation()">
+    <div class="vintage-card modal-container" (click)="$event.stopPropagation()">
 
         <!-- Cabeçalho do Modal -->
         <div class="modal-header">
-            <h2>{{ isEditing ? '✏️ Editar Tarefa' : '➕ Nova Tarefa' }}</h2>
+            <h2>{{ isEditing ? '✏️ Ficha: Editar Tarefa' : '➕ Ficha: Nova Tarefa' }}</h2>
             <button class="btn-close" (click)="onCancel()" title="Fechar">✕</button>
         </div>
 
@@ -15,21 +15,21 @@
             <!-- Campo: Título -->
             <div class="form-group">
                 <label for="titulo" class="form-label">
-                    Título da Tarefa <span class="required">*</span>
+                    Título da Atividade <span class="required">*</span>
                 </label>
                 <input id="titulo" type="text" formControlName="titulo" placeholder="Ex: Estudar Angular Signals & RxJS"
                     class="form-input"
                     [class.is-invalid]="taskForm.get('titulo')?.invalid && taskForm.get('titulo')?.touched" />
                 @if (taskForm.get('titulo')?.invalid && taskForm.get('titulo')?.touched) {
-                <span class="error-msg">O título é obrigatório e deve ter no mínimo 3 caracteres.</span>
+                <span class="error-msg">O título é obrigatório (mínimo de 3 caracteres).</span>
                 }
             </div>
 
             <!-- Campo: Descrição -->
             <div class="form-group">
-                <label for="descricao" class="form-label">Descrição (Opcional)</label>
-                <textarea id="descricao" formControlName="descricao" rows="3"
-                    placeholder="Descreva os detalhes ou observações desta atividade..."
+                <label for="descricao" class="form-label">Anotações / Descrição</label>
+                <textarea id="descricao" formControlName="descricao" rows="4"
+                    placeholder="Detalhamento das etapas ou observações..."
                     class="form-textarea"></textarea>
             </div>
 
@@ -39,7 +39,7 @@
                     Cancelar
                 </button>
                 <button type="submit" class="btn btn-primary" [disabled]="taskForm.invalid">
-                    {{ isEditing ? 'Atualizar Tarefa' : 'Criar Tarefa' }}
+                    {{ isEditing ? 'Salvar Alterações' : 'Arquivar Atividade' }}
                 </button>
             </div>
 
