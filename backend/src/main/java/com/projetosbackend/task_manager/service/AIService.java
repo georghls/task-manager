@@ -1,18 +1,22 @@
 package com.projetosbackend.task_manager.service;
 
+import com.projetosbackend.task_manager.dto.AiGenerateResponseDTO;
 import com.projetosbackend.task_manager.dto.AiSummaryDTO;
+import com.projetosbackend.task_manager.dto.TaskResponseDTO;
 import com.projetosbackend.task_manager.model.Task;
 import com.projetosbackend.task_manager.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import tools.jackson.databind.ObjectMapper;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @Service
-public class GeminiAIService {
+public class AIService {
 
     private final TaskRepository taskRepository;
     private final RestClient restClient;
@@ -26,7 +30,7 @@ public class GeminiAIService {
     @Value("${ai.api.model}")
     private String apiModel;
 
-    public GeminiAIService(TaskRepository taskRepository) {
+    public AIService(TaskRepository taskRepository) {
         this.taskRepository = taskRepository;
         this.restClient = RestClient.create();
     }
@@ -107,4 +111,72 @@ public class GeminiAIService {
         }
         return "Resumo gerado, porém o formato da resposta veio diferente do esperado.";
     }
+
+    /**
+     * Recebe um texto livre do usuário, envia para a IA interpretar,
+     * e salva automaticamente as tarefas geradas no banco.
+     */
+    public AiGenerateResponseDTO gerarTarefasAutomaticamente(String promptUsuario) {
+        String promptSistema = "Você é um assistente de produtividade. "
+                + "O usuário vai descrever o que ele precisa fazer em texto livre. "
+                + "Sua tarefa é interpretar o texto e extrair uma lista de tarefas. "
+                + "Para cada tarefa, defina um 'titulo' curto e claro e uma 'descricao' detalhada. "
+                + "Responda APENAS com um JSON válido no seguinte formato, sem nenhum texto extra:\n"
+                + "[{\"titulo\": \"...\", \"descricao\": \"...\"}, {\"titulo\": \"...\", \"descricao\": \"...\"}]";
+
+        Map<String, Object> systemMessage = Map.of("role", "system", "content", promptSistema);
+        Map<String, Object> userMessage = Map.of("role", "user", "content", promptUsuario);
+        Map<String, Object> requestBody = Map.of(
+                "model", apiModel,
+                "messages", List.of(systemMessage, userMessage),
+                "max_tokens", 1000,
+                "temperature", 0.3
+        );
+
+        try {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> response = restClient.post()
+                    .uri(apiUrl)
+                    .header("Authorization", "Bearer " + apiKey)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(requestBody)
+                    .retrieve()
+                    .body(Map.class);
+
+            String jsonResposta = extrairTextoResposta(response);
+
+            // Limpa possíveis marcadores de código markdown
+            jsonResposta = jsonResposta.trim();
+            if (jsonResposta.startsWith("```")) {
+                jsonResposta = jsonResposta.replaceAll("```json\\s*", "").replaceAll("```\\s*", "");
+            }
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            List<Map<String, String>> tarefasParseadas = objectMapper.readValue(
+                    jsonResposta,
+                    objectMapper.getTypeFactory().constructCollectionType(List.class, Map.class)
+            );
+
+            List<TaskResponseDTO> tarefasCriadas = new ArrayList<>();
+            for (Map<String, String> tarefaMap : tarefasParseadas) {
+                Task novaTarefa = new Task();
+                novaTarefa.setTitulo(tarefaMap.getOrDefault("titulo", "Tarefa sem título"));
+                novaTarefa.setDescricao(tarefaMap.getOrDefault("descricao", ""));
+                Task tarefaSalva = taskRepository.save(novaTarefa);
+                tarefasCriadas.add(new TaskResponseDTO(tarefaSalva));
+            }
+
+            String mensagem = String.format("✅ %d tarefa(s) criada(s) com sucesso pela IA!", tarefasCriadas.size());
+            return new AiGenerateResponseDTO(tarefasCriadas, mensagem);
+
+        } catch (Exception e) {
+            System.err.println("❌ Erro ao gerar tarefas com IA: " + e.getMessage());
+            e.printStackTrace();
+            return new AiGenerateResponseDTO(
+                    List.of(),
+                    "Erro ao gerar tarefas: " + e.getMessage()
+            );
+        }
+    }
+
 }

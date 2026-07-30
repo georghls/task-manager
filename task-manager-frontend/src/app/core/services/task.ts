@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { AiSummaryResponseDTO, TaskRequestDTO, TaskResponseDTO } from '../models/task';
+import { AiGenerateRequestDTO, AiGenerateResponseDTO, AiSummaryResponseDTO, TaskRequestDTO, TaskResponseDTO } from '../models/task';
 import { environment } from '../../../environments/environments'; // Ajuste o caminho se seu arquivo for environment.ts
 
 @Injectable({
@@ -68,5 +68,14 @@ export class TaskService {
     getAiSummary(): Observable<AiSummaryResponseDTO> {
         return this.http.get<AiSummaryResponseDTO>(`${this.apiUrl}/ai/summary`);
     }
+
+    /**
+     * POST /tasks/ai/generate
+     * Envia o texto do usuário para a IA gerar tarefas automaticamente.
+     */
+    generateTasksWithAi(dto: AiGenerateRequestDTO): Observable<AiGenerateResponseDTO> {
+        return this.http.post<AiGenerateResponseDTO>(`${this.apiUrl}/ai/generate`, dto);
+    }
+
 
 }

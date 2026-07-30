@@ -30,3 +30,15 @@ export interface AiSummaryResponseDTO {
     resumo: string;
     statusConexao: 'ONLINE' | 'OFFLINE' | 'SEM_TAREFAS' | 'ERRO';
 }
+
+// Interface para enviar o prompt do usuário para a IA gerar tarefas
+export interface AiGenerateRequestDTO {
+    prompt: string;
+}
+
+// Interface para receber a resposta da IA com as tarefas criadas
+export interface AiGenerateResponseDTO {
+    tarefasCriadas: TaskResponseDTO[];
+    mensagem: string;
+    quantidadeCriada: number;
+}

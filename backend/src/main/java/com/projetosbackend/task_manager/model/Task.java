@@ -23,6 +23,7 @@ public class Task {
     @NotBlank(message = "o título é obrigatório") // rejeita tasks sem titulos
     private String titulo;
 
+    @Column(length = 1000)
     private String descricao;
 
     private boolean concluida = false;

@@ -1,9 +1,7 @@
 package com.projetosbackend.task_manager.controller;
 
-import com.projetosbackend.task_manager.dto.AiSummaryDTO;
-import com.projetosbackend.task_manager.dto.TaskRequestDTO;
-import com.projetosbackend.task_manager.dto.TaskResponseDTO;
-import com.projetosbackend.task_manager.service.GeminiAIService;
+import com.projetosbackend.task_manager.dto.*;
+import com.projetosbackend.task_manager.service.AIService;
 import com.projetosbackend.task_manager.service.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -17,18 +15,24 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:4200")
 public class TaskController {
     private final TaskService taskService;
-    private final GeminiAIService geminiAiService;
+    private final AIService aiService;
 
-    public TaskController(TaskService taskService, GeminiAIService geminiAiService) {
+    public TaskController(TaskService taskService, AIService aiService) {
 
         this.taskService = taskService;
-        this.geminiAiService = geminiAiService;
+        this.aiService = aiService;
     }
 
     @GetMapping("/ai/summary")
     public ResponseEntity<AiSummaryDTO> obterResumoIa() {
-        AiSummaryDTO resumo = geminiAiService.gerarResumoTarefas();
+        AiSummaryDTO resumo = aiService.gerarResumoTarefas();
         return ResponseEntity.ok(resumo);
+    }
+
+    @PostMapping("/ai/generate")
+    public ResponseEntity<AiGenerateResponseDTO> gerarTarefasComIa(@Valid @RequestBody AiGenerateRequestDTO dto) {
+        AiGenerateResponseDTO resultado = aiService.gerarTarefasAutomaticamente(dto.prompt());
+        return ResponseEntity.ok(resultado);
     }
 
     @PostMapping
