@@ -12,7 +12,6 @@ import java.util.List;
 
 @RestController // Diz ao Spring que esta classe vai lidar com endpoints HTTP/REST
 @RequestMapping("/tasks") // Define que todos os endpoints deste controller começam com /tasks
-@CrossOrigin(origins = "http://localhost:4200")
 public class TaskController {
     private final TaskService taskService;
     private final AIService aiService;

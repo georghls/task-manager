@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 
 public class Task {
     @Id // Diz ao JPA que esse campo é a chave primária da tabela
-    @GeneratedValue(strategy = GenerationType.AUTO) // Gera o valor do id automaticamente
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Gera o valor do id automaticamente
     private Long id; // suporta valores muito maiores
 
     @NotBlank(message = "o título é obrigatório") // rejeita tasks sem titulos
