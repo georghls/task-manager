@@ -1,27 +1,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Lora:ital,wght@0,400..700;1,400..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
 
 :root {
-    /* Cores - Vintage Muted Pastels & Solid Ink */
-    --bg-primary: #FAF6EE;
-    --bg-desktop: #EBE5D8;
+    /* Cores - Paleta Pastel Personalizada (Mantendo as bordas sólidas do estilo original) */
+    --bg-primary: #FFFFFF; /* Fundo do dash branco */
+    --bg-beige: #fcf5c7; /* Cor bege guardada para o header */
+    --bg-desktop: #f6ecb3;
     --bg-surface: #FFFFFF;
     
-    --border-color: #2B2D2F;
-    --text-primary: #2B2D2F;
-    --text-secondary: #5A5E61;
-    --text-muted: #7E8488;
+    --border-color: #27272A;
+    --text-primary: #27272A;
+    --text-secondary: #52525B;
+    --text-muted: #A1A1AA;
 
-    --accent-peach: #F8DCCB;
-    --accent-sage: #D1E2D3;
-    --accent-blue: #D2DFEC;
-    --accent-yellow: #F4E5BE;
+    --accent-blue: #79addc;
+    --accent-peach: #ffc09f;
+    --accent-yellow: #ffee93;
+    --accent-sage: #adf7b6;
 
-    /* Fontes Vintage */
+    /* Fontes Vintage (Restauradas) */
     --font-display: 'Playfair Display', serif;
     --font-body: 'Lora', serif;
     --font-mono: 'Courier Prime', monospace;
 
-    /* Bordas e Sombras */
+    /* Bordas e Sombras (Restauradas para o flat/neo-brutalist) */
     --shadow-flat: 4px 4px 0px var(--border-color);
     --shadow-flat-hover: 6px 6px 0px var(--border-color);
     --shadow-flat-active: 1px 1px 0px var(--border-color);
@@ -104,12 +105,12 @@ body {
 }
 
 .btn-primary {
-    background: var(--accent-peach);
+    background: var(--accent-blue);
     color: var(--text-primary);
 }
 
 .btn-primary:hover {
-    background: #f5ccb5;
+    background: #6ca0cc; /* slightly darker blue for hover */
 }
 
 .btn-secondary {
